@@ -54,8 +54,10 @@ async def resolve_prefix_diag(request:fastapi.Request, identifier:str=None):
         arkpid = f"ark:/{arkpid}"
     naan = None
     pid = None
+    remainder = None
     if matches is not None:
         naan = matches.group(2)
+        remainder = matches.group(3)
         pid = arkpid[arkpid.find(naan):]
     return {
         "url":rurl,
@@ -63,6 +65,7 @@ async def resolve_prefix_diag(request:fastapi.Request, identifier:str=None):
         "url.query": request.url.query,
         "path": identifier,
         "naan": naan,
+        "remainder": remainder,
         "pid": pid,
         "arkpid": arkpid,
     }
@@ -86,6 +89,7 @@ async def resolve_prefix(
     if matches is None:
         raise fastapi.HTTPException(status_code=404, detail=f"Not found.")
     naan = matches.group(2)
+    remainder = matches.group(3)
     arkpid = rurl[rurl.find(identifier):]
     if not arkpid.startswith("ark:"):
         arkpid = f"ark:/{arkpid}"
@@ -95,7 +99,7 @@ async def resolve_prefix(
         raise fastapi.HTTPException(status_code=404, detail=f"NAAN {naan} not found.")
     with open(fname, "r") as fsrc:
         naan_record = json.load(fsrc)
-    if rurl.endswith("?info") or rurl.endswith("?") or rurl.endswith("??"):
+    if remainder == "" and (rurl.endswith("?info") or rurl.endswith("?") or rurl.endswith("??")):
         return naan_record
     if "$pid" in naan_record["target"]:
         return fastapi.responses.RedirectResponse(naan_record["target"].replace("$pid", pid))
