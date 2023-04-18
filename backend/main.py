@@ -47,8 +47,11 @@ async def favicon():
 @app.get("/diag/{identifier:path}")
 async def resolve_prefix_diag(request:fastapi.Request, identifier:str=None):
     rurl = str(request.url)
+    identifier = identifier.lstrip("/ ")
     matches = ARK_MATCH.fullmatch(identifier)
     arkpid = rurl[rurl.find(identifier):]
+    if not arkpid.startswith("ark:"):
+        arkpid = f"ark:/{arkpid}"
     naan = None
     pid = None
     if matches is not None:
@@ -78,11 +81,14 @@ async def resolve_prefix(
         # should never reach this, but just in case...
         return fastapi.responses.RedirectResponse("/docs")
     rurl = str(request.url)
+    identifier = identifier.lstrip("/ ")
     matches = ARK_MATCH.fullmatch(identifier)
     if matches is None:
         raise fastapi.HTTPException(status_code=404, detail=f"Not found.")
     naan = matches.group(2)
     arkpid = rurl[rurl.find(identifier):]
+    if not arkpid.startswith("ark:"):
+        arkpid = f"ark:/{arkpid}"
     pid = arkpid[arkpid.find(naan):]
     fname = os.path.join(DATA_DIR,f"{naan}.json")
     if not os.path.exists(fname):
