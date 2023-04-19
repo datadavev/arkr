@@ -48,12 +48,14 @@ DATA_DIR = "naans/"
 async def favicon():
     raise fastapi.HTTPException(status_code=404)
 
+
 def iter_csv(writer, data, stream):
-    yield()
+    yield ()
+
 
 @app.get("/", summary="List registered NAANs")
 async def list_prefixes(
-    accept: typing.Optional[str] = fastapi.Header(default="application/json")
+    accept: typing.Optional[str] = fastapi.Header(default="application/json"),
 ):
     accept = [a.strip() for a in accept.split(",")]
     supported_types = ["application/json", "text/csv"]
@@ -76,11 +78,21 @@ async def list_prefixes(
         content_type = "application/json"
     if content_type == "text/csv":
         stream = io.StringIO()
-        writer = csv.DictWriter(stream, fieldnames=["what","who","where","when",])
+        writer = csv.DictWriter(
+            stream,
+            fieldnames=[
+                "what",
+                "who",
+                "where",
+                "when",
+            ],
+        )
         writer.writeheader()
         for row in naans:
             writer.writerow(row)
-        return fastapi.responses.PlainTextResponse(stream.getvalue(), media_type=content_type)
+        return fastapi.responses.PlainTextResponse(
+            stream.getvalue(), media_type=content_type
+        )
     return naans
 
 
@@ -124,6 +136,7 @@ async def resolve_prefix(
         # should never reach this, but just in case...
         return fastapi.responses.RedirectResponse("/docs")
     rurl = str(request.url)
+    print(rurl)
     identifier = identifier.lstrip("/ ")
     matches = ARK_MATCH.fullmatch(identifier)
     if matches is None:
@@ -140,7 +153,10 @@ async def resolve_prefix(
     with open(fname, "r") as fsrc:
         naan_record = json.load(fsrc)
     if remainder == "" and (
-        rurl.endswith("?info") or rurl.endswith("?") or rurl.endswith("??")
+        rurl.endswith("?info")
+        or rurl.endswith("?")
+        or rurl.endswith("??")
+        or rurl.endswith("?%3F")
     ):
         return naan_record
     if "$pid" in naan_record["target"]:

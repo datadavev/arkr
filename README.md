@@ -28,21 +28,20 @@ cd backend
 uvicorn main:app
 ```
 
-A [spacefile](https://deta.space/docs/en/introduction/start) is included for deployment on [Deta Space](https://deta.space/). To deploy on Deta Space:
+The service may be deployed to any service supporting python WSGI such as Vercel. For example:
 
 ```
-space new
-space push
+vercel deploy
 ```
 
-An example of the service running on Deta is available at: https://arkr-1-v3111276.deta.app/
+An example of the service running on Vercel is available at: https://arkr.vercel.app/
 
 ## Service Endpoints
 
-| Path                                             | Description                                                                                                                                                                                                                                                                                                                                                                                                              |
-|--------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`/docs`](https://arkr-1-v3111276.deta.app/docs) | API documentation                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `/diag/{IDENTIFIER}`                             | Presents some diagnostics of request processing. E.g. [diag/ark:/12148/bpt6k10733944](https://arkr-1-v3111276.deta.app/diag/ark:/12148/bpt6k10733944)                                                                                                                                                                                                                                                                    |
-| `/{IDENTIFIER}`                                  | Redirects to supplied ARK. <br>* [`/ark:/12148/bpt6k10733944`](https://arkr-1-v3111276.deta.app/ark:/12148/bpt6k10733944) <br>* [`/ark:12148/bpt6k10733944`](https://arkr-1-v3111276.deta.app/ark:12148/bpt6k10733944) <br>* [`/12148/bpt6k10733944`](https://arkr-1-v3111276.deta.app/12148/bpt6k10733944)                                                                                                              |
-| `/{NAAN}[/][?? \| ?info]`                        | Returns metadata about the NAAN. Note that if characters beyond a terminating "/" are included then the response is a redirect to the registered location with the provided inflection request. <br>* [`/ark:/12148/?info`](https://arkr-1-v3111276.deta.app/ark:/12148/?info) <br>* [`/ark:12148??`](https://arkr-1-v3111276.deta.app/ark:12148??) <br>* [`/12148/?info`](https://arkr-1-v3111276.deta.app/12148??) |
+| Path                                             | Description                                                                                                                                                                                                                                                                                                                                                                                                      |
+|--------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`/docs`](https://arkr.vercel.app/docs) | API documentation                                                                                                                                                                                                                                                                                                                                                                                                |
+| `/diag/{IDENTIFIER}`                             | Presents some diagnostics of request processing. E.g. [diag/ark:/12148/bpt6k10733944](https://arkr.vercel.app/diag/ark:/12148/bpt6k10733944)                                                                                                                                                                                                                                                                |
+| `/{IDENTIFIER}`                                  | Redirects to supplied ARK. <br>* [`/ark:/12148/bpt6k10733944`](https://arkr.vercel.app/ark:/12148/bpt6k10733944) <br>* [`/ark:12148/bpt6k10733944`](https://arkr.vercel.app/ark:12148/bpt6k10733944) <br>* [`/12148/bpt6k10733944`](https://arkr-1-v3111276.deta.app/12148/bpt6k10733944)                                                                                                              |
+| `/{NAAN}[/][?? \| ?info]`                        | Returns metadata about the NAAN. Note that if characters beyond a terminating "/" are included then the response is a redirect to the registered location with the provided inflection request. <br>* [`/ark:/12148/?info`](https://arkr.vercel.app/ark:/12148/?info) <br>* [`/ark:12148??`](https://arkr.vercel.app/ark:12148??) <br>* [`/12148/?info`](https://arkr.vercel.app/12148??) |
 
