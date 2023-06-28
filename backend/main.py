@@ -1,4 +1,4 @@
-"""ARKR is a minimal ARK NAAN resolver service.
+"""ARKR is an ARK NAAN resolver service.
 """
 import csv
 import glob
@@ -11,7 +11,7 @@ import content_negotiation
 import fastapi
 import fastapi.middleware.cors
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 app = fastapi.FastAPI(
     title="ARKR",
