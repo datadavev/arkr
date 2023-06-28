@@ -58,40 +58,17 @@ async def list_prefixes(
     accept: typing.Optional[str] = fastapi.Header(default="application/json"),
 ):
     accept = [a.strip() for a in accept.split(",")]
-    supported_types = ["application/json", "text/csv"]
-    naans = []
-    sources = glob.glob(os.path.join(DATA_DIR, "*.json"))
-    for fn in sources:
-        with open(fn, "r") as fsrc:
-            naan = json.load(fsrc)
-            naans.append(
-                {
-                    "what": naan["what"],
-                    "who": naan["who"]["name"],
-                    "where": naan["where"],
-                    "when": naan["when"],
-                }
-            )
+    supported_types = ["application/json", "text/csv", "text/plain"]
     try:
         content_type = content_negotiation.decide_content_type(accept, supported_types)
     except content_negotiation.NoAgreeableContentTypeError:
         content_type = "application/json"
-    if content_type == "text/csv":
-        stream = io.StringIO()
-        writer = csv.DictWriter(
-            stream,
-            fieldnames=[
-                "what",
-                "who",
-                "where",
-                "when",
-            ],
-        )
-        writer.writeheader()
-        for row in naans:
-            writer.writerow(row)
+    with open(os.path.join(DATA_DIR, "index.json")) as fsrc:
+        data = json.load(fsrc)
+        naans = list(data.keys())
+    if content_type in ["text/csv", "text/plain"]:
         return fastapi.responses.PlainTextResponse(
-            stream.getvalue(), media_type=content_type
+            "\n".join(naans), media_type=content_type
         )
     return naans
 
