@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "public": false,
+  "builds": [{ "src": "backend/main.py", "use": "@vercel/python" }],
+  "routes": [
+    { "src": "/(.*)", "dest": "backend/main.py" }
+  ]
+}
