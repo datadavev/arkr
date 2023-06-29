@@ -41,7 +41,7 @@ app.add_middleware(
 )
 
 ARK_MATCH = re.compile("(^|ark\:|ark\:\/)([0-9]{4,64})\/?(.*)", re.IGNORECASE)
-DATA_DIR = "naans/"
+DATA_DIR = "naan_reg_public/naans/"
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -52,6 +52,10 @@ async def favicon():
 def iter_csv(writer, data, stream):
     yield ()
 
+
+def naan_file_path(naan:str) -> str:
+    subfolder = naan[0]
+    return os.path.join(DATA_DIR,subfolder,f"naan.json")
 
 @app.get("/", summary="List registered NAANs")
 async def list_prefixes(
@@ -124,7 +128,7 @@ async def resolve_prefix(
     if not arkpid.startswith("ark:"):
         arkpid = f"ark:/{arkpid}"
     pid = arkpid[arkpid.find(naan) :]
-    fname = os.path.join(DATA_DIR, f"{naan}.json")
+    fname = naan_file_path(naan)
     if not os.path.exists(fname):
         raise fastapi.HTTPException(status_code=404, detail=f"NAAN {naan} not found.")
     with open(fname, "r") as fsrc:
