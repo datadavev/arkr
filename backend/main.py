@@ -8,8 +8,10 @@ import os
 import re
 import typing
 import content_negotiation
+import dulwich.porcelain
 import fastapi
 import fastapi.middleware.cors
+
 
 VERSION = "0.0.3"
 
@@ -41,7 +43,8 @@ app.add_middleware(
 )
 
 ARK_MATCH = re.compile("(^|ark\:|ark\:\/)([0-9]{4,64})\/?(.*)", re.IGNORECASE)
-DATA_DIR = "naan_reg_public/naans/"
+DATA_DIR = "naan_reg_public/"
+NAANS_DIR = os.path.join(DATA_DIR, "naans")
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -53,9 +56,10 @@ def iter_csv(writer, data, stream):
     yield ()
 
 
-def naan_file_path(naan:str) -> str:
+def naan_file_path(naan: str) -> str:
     subfolder = naan[0]
-    return os.path.join(DATA_DIR,subfolder,f"naan.json")
+    return os.path.join(NAANS_DIR, subfolder, f"{naan}.json")
+
 
 @app.get("/", summary="List registered NAANs")
 async def list_prefixes(
@@ -67,7 +71,7 @@ async def list_prefixes(
         content_type = content_negotiation.decide_content_type(accept, supported_types)
     except content_negotiation.NoAgreeableContentTypeError:
         content_type = "application/json"
-    with open(os.path.join(DATA_DIR, "index.json")) as fsrc:
+    with open(os.path.join(NAANS_DIR, "index.json")) as fsrc:
         data = json.load(fsrc)
         naans = list(data.keys())
     if content_type in ["text/csv", "text/plain"]:
@@ -75,6 +79,21 @@ async def list_prefixes(
             "\n".join(naans), media_type=content_type
         )
     return naans
+
+
+@app.get("/_pull")
+def pull_naans():
+    """
+    Update the repo with a pull from origin
+    """
+    msg = None
+    try:
+        repo = dulwich.porcelain.Repo(DATA_DIR)
+        branch_ref = f"refs/heads/{dulwich.porceleain.active_branch(repo).decode()}"
+        msg = dulwich.porcelain.pull(repo, refspecs=branch_ref)
+    except Exception as e:
+        msg = str(e)
+    return {"message": msg}
 
 
 @app.get("/diag/{identifier:path}")
